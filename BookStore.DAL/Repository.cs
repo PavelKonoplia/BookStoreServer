@@ -1,6 +1,5 @@
 ﻿using BookStore.Common.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
@@ -18,7 +17,7 @@ namespace BookStore.DAL
             this.dbSet = userDataContext.Set<T>();
         }
 
-        public IEnumerable<T> GetAll()
+        public IQueryable<T> GetAll()
         {
             return this.dbSet.AsNoTracking();
         }

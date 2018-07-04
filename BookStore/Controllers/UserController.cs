@@ -1,6 +1,12 @@
 ﻿using BookStore.BLL;
+using BookStore.DAL;
+using BookStore.Entity.Enums;
 using BookStore.Entity.Models;
 using Microsoft.AspNet.Identity;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 
@@ -9,10 +15,12 @@ namespace BookStore.Controllers
     public class UserController : ApiController
     {
         private IdentityUserManager userManager;
+        private UserService userService;
 
-        public UserController(IdentityUserManager _userManager)
+        public UserController(IdentityUserManager userManager, UserService userService)
         {
-            userManager = _userManager;
+            this.userService = userService;
+            this.userManager = userManager;
         }
 
 
@@ -21,7 +29,10 @@ namespace BookStore.Controllers
         [Route("api/user")]
         public IHttpActionResult Get()
         {
-            return Ok(this.userManager.Users);
+          //  IQueryable<User> query = this.userManager.Users;
+           // query = query.Include(x => x.Selling).Include(x => x.Orders);
+
+            return Ok(this.userService.GetUsers());
         }
 
 
@@ -54,9 +65,11 @@ namespace BookStore.Controllers
             IdentityResult addUserResult = await this.userManager.CreateAsync(userData, user.PasswordHash);
 
             if (!addUserResult.Succeeded)
-            {
+            {                
                 return StatusCode(System.Net.HttpStatusCode.BadRequest);
             }
+
+            await this.userManager.AddToRoleAsync(userData.Id, Role.Customer.ToString());
 
             return Created("api/user", user);
         }
@@ -82,14 +95,13 @@ namespace BookStore.Controllers
         [Authorize(Roles = "Admin")]
         [HttpPut]
         [Route("api/user")]
-        public async Task<IHttpActionResult> Update(long id, string oldRole, string newRole)
+        public async Task<IHttpActionResult> UpdateRole([FromUri] long id, [FromUri]string role)
         {
             User user = await userManager.FindByIdAsync(id);
-
             if (user != null)
             {
-                await userManager.RemoveFromRoleAsync(user.Id, oldRole);
-                await userManager.AddToRoleAsync(user.Id, newRole);
+                await userManager.RemoveFromRolesAsync(user.Id, Enum.GetNames(typeof(Role)));
+                await userManager.AddToRoleAsync(user.Id, role);
                 return Ok();
             }
             else
@@ -98,25 +110,23 @@ namespace BookStore.Controllers
             }
         }
 
-        // TODO RoleRequest 
 
-        //[Authorize(Roles = "Admin")]
-        //[HttpPut]
-        //[Route("api/user")]
-        //public async Task<IHttpActionResult> Update(long id, string oldRole, string newRole)
-        //{
-        //    User user = await userManager.FindByIdAsync(id);
+        [Authorize]
+        [HttpGet]
+        [Route("api/user")]
+        public async Task<IHttpActionResult> GetRole([FromUri]long id)
+        {
+            User user = await userManager.FindByIdAsync(id);
 
-        //    if (user != null)
-        //    {
-        //        await userManager.RemoveFromRoleAsync(user.Id, oldRole);
-        //        await userManager.AddToRoleAsync(user.Id, newRole);
-        //        return Ok();
-        //    }
-        //    else
-        //    {
-        //        return NotFound();
-        //    }
-        //}
+            if (user != null)
+            {
+                var roles = await userManager.GetRolesAsync(user.Id);
+                return Ok(roles);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
     }
 }

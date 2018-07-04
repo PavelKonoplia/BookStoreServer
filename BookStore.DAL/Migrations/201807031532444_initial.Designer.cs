@@ -13,7 +13,7 @@ namespace BookStore.DAL.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201806261441335_initial"; }
+            get { return "201807031532444_initial"; }
         }
         
         string IMigrationMetadata.Source

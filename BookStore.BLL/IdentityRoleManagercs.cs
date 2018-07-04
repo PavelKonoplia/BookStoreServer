@@ -12,13 +12,5 @@ namespace BookStore.BLL
         public IdentityRoleManager(IRoleStore<CustomRole, long>  store)
            : base(store)
         { }
-
-       /* public static IdentityRoleManager Create(
-            IdentityFactoryOptions<IdentityRoleManager> options,
-            IOwinContext context)
-        {
-            return new IdentityRoleManager(new
-                CustomRoleStore(context.Get<IdentityDatabaseContext>()));
-        }*/
     }
 }

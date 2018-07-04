@@ -14,13 +14,15 @@ namespace BookStore.Controllers
             this.dataProvider = dataProvider;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         [Route("api/order")]
         public IHttpActionResult Get()
         {
             return Ok(dataProvider.GetAll());
         }
-        
+
+        [Authorize]
         [HttpPost]
         [Route("api/order")]
         public IHttpActionResult Post([FromBody]Order order)

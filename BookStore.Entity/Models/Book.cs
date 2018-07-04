@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BookStore.Entity.Models
 {
-    public class Book : BaseModel
+    public class Book : BaseProductModel
     {
         public Book()
         {

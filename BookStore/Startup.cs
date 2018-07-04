@@ -7,8 +7,10 @@ using Autofac.Integration.WebApi;
 using BookStore.BLL;
 using BookStore.Common.Interfaces;
 using BookStore.DAL;
+using BookStore.Entity.Enums;
 using BookStore.Entity.Models;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.OAuth;
@@ -39,11 +41,12 @@ namespace BookStore
             // OPTIONAL: Register the Autofac model binder provider.
             builder.RegisterWebApiModelBinderProvider();
 
-            builder.RegisterType<IdentityDatabaseContext>().As(typeof(DbContext)).SingleInstance();
+            builder.RegisterType<IdentityDatabaseContext>().As(typeof(DbContext)).AsSelf().SingleInstance();
             builder.RegisterType<CustomRoleStore>().As(typeof(IRoleStore<CustomRole, long>)).InstancePerDependency();
             builder.RegisterType<CustomUserStore>().As(typeof(IUserStore<User, long>)).InstancePerDependency();
             builder.RegisterType<IdentityUserManager>().InstancePerDependency();
-            builder.RegisterType<IdentityRoleManager>().InstancePerDependency();
+            builder.RegisterType<IdentityRoleManager>().InstancePerDependency(); ;
+            builder.RegisterType<UserService>().InstancePerDependency();
             builder.RegisterType<IdentityFactoryOptions<IdentityUserManager>>().InstancePerDependency();
           //  builder.RegisterType<IdentityFactoryOptions<IdentityRoleManager>>().InstancePerDependency();
 
@@ -51,7 +54,7 @@ namespace BookStore
 
             config.DependencyResolver = new AutofacWebApiDependencyResolver(container);
 
-            CreateRoles(container);
+            CreateRolesAsync(container);
 
             app.UseAutofacMiddleware(container);
             app.UseAutofacWebApi(config);
@@ -80,26 +83,34 @@ namespace BookStore
             app.UseOAuthBearerTokens(OAuthOptions);
         }
 
-        public void CreateRoles(IContainer container)
+        public async void CreateRolesAsync(IContainer container)
         {
             IdentityRoleManager roleManager = container.Resolve<IdentityRoleManager>();
 
             IdentityUserManager userManager = container.Resolve<IdentityUserManager>();
 
-            userManager.AddToRoleAsync(6, "Admin");
+            if (userManager.FindById(6)!=null)
+            {
+                await userManager.AddToRoleAsync(6, Role.Admin.ToString());
+            }
 
-            if (roleManager.FindByNameAsync("Admin").Result == null)
+            if (userManager.FindById(7) != null)
             {
-                roleManager.CreateAsync(new CustomRole("Admin"));
-                userManager.AddToRoleAsync(1,"Admin");
+                await userManager.AddToRoleAsync(7, Role.Seller.ToString());
             }
-            if (roleManager.FindByNameAsync("Seller").Result == null)
+
+            if (roleManager.FindByNameAsync(Role.Admin.ToString()).Result == null)
             {
-                roleManager.CreateAsync(new CustomRole("Seller"));
+                await roleManager.CreateAsync(new CustomRole(Role.Admin.ToString()));
+                await userManager.AddToRoleAsync(1, Role.Admin.ToString());
             }
-            if (roleManager.FindByNameAsync("Customer").Result == null)
+            if (roleManager.FindByNameAsync(Role.Seller.ToString()).Result == null)
             {
-                roleManager.CreateAsync(new CustomRole("Customer"));
+                await roleManager.CreateAsync(new CustomRole(Role.Seller.ToString()));
+            }
+            if (roleManager.FindByNameAsync(Role.Customer.ToString()).Result == null)
+            {
+                await roleManager.CreateAsync(new CustomRole(Role.Customer.ToString()));
             }
         }
     }

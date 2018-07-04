@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using BookStore.Entity.Models;
 using Microsoft.AspNet.Identity;
+using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.OAuth;
 using Newtonsoft.Json;
 
@@ -31,6 +32,11 @@ namespace BookStore.BLL
             }
 
             context.AdditionalResponseParameters.Add("userID", this.user.Id);
+            if (this.userManager.GetRoles(this.user.Id).Count != 0)
+            {
+                context.AdditionalResponseParameters.Add("role", this.userManager.GetRoles(this.user.Id)[0]);
+            }
+
 
             return Task.FromResult<object>(null);
         }
@@ -42,11 +48,40 @@ namespace BookStore.BLL
             if (this.user == null)
             {
                 context.SetError("invalid_grant",
-                "The user name or password is incorrect.");
+                "User name or password is incorrect.");
                 return;
             }
 
-            context.Validated(new ClaimsIdentity(context.Options.AuthenticationType));
+            //context.Validated(new ClaimsIdentity(user as IEnumerable<Claim>, context.Options.AuthenticationType));
+            
+            if (user == null)
+            {
+                context.SetError("invalid_grant", "The user name or password is incorrect.");
+                return;
+            }
+
+            var identity = new ClaimsIdentity(context.Options.AuthenticationType);
+            identity.AddClaim(new Claim(ClaimTypes.Name, context.UserName));
+            identity.AddClaim(new Claim("sub", context.UserName));
+
+            //this loop is where the roles are added as claims
+            foreach (var role in userManager.GetRoles(user.Id))
+            {
+                identity.AddClaim(new Claim(ClaimTypes.Role, role));
+            }
+
+            var props = new AuthenticationProperties(new Dictionary<string, string>
+            {
+                {
+                "as:client_id", context.ClientId ?? string.Empty
+                },
+                {
+                "userName", context.UserName
+                }
+            });
+
+            var ticket = new AuthenticationTicket(identity, props);
+            context.Validated(ticket);
         }
     }
 }

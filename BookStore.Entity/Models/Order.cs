@@ -7,14 +7,15 @@ namespace BookStore.Entity.Models
     {
         public Order()
         {
-            this.Goods = new HashSet<BaseModel>();
+            this.Goods = new HashSet<BaseProductModel>();
         }
 
         [Key]
         public int Id { get; set; }
+        
+        public long UserId { get; set; }
+        public virtual User User { get; set; }
 
-        public User User { get; set; }
-
-        public ICollection<BaseModel> Goods { get; set; }
+        public ICollection<BaseProductModel> Goods { get; set; }
     }
 }

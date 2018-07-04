@@ -8,33 +8,33 @@ namespace BookStore.DAL.Migrations
         public override void Up()
         {
             CreateTable(
-                "dbo.BaseModels",
+                "dbo.BaseProductModels",
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
                         Price = c.Decimal(nullable: false, precision: 18, scale: 2),
+                        UserId = c.Long(),
                         Title = c.String(),
                         ISO = c.String(maxLength: 8),
                         Description = c.String(),
                         Genre = c.String(),
                         Author = c.String(),
                         Discriminator = c.String(nullable: false, maxLength: 128),
-                        User_Id = c.Long(),
                     })
                 .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.Users", t => t.User_Id)
-                .Index(t => t.User_Id);
+                .ForeignKey("dbo.Users", t => t.UserId)
+                .Index(t => t.UserId);
             
             CreateTable(
                 "dbo.Orders",
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
-                        User_Id = c.Long(),
+                        UserId = c.Long(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.Users", t => t.User_Id)
-                .Index(t => t.User_Id);
+                .ForeignKey("dbo.Users", t => t.UserId, cascadeDelete: true)
+                .Index(t => t.UserId);
             
             CreateTable(
                 "dbo.Users",
@@ -116,16 +116,16 @@ namespace BookStore.DAL.Migrations
                 .Index(t => t.Name, unique: true, name: "RoleNameIndex");
             
             CreateTable(
-                "dbo.BaseModelOrders",
+                "dbo.BaseProductModelOrders",
                 c => new
                     {
-                        BaseModel_Id = c.Int(nullable: false),
+                        BaseProductModel_Id = c.Int(nullable: false),
                         Order_Id = c.Int(nullable: false),
                     })
-                .PrimaryKey(t => new { t.BaseModel_Id, t.Order_Id })
-                .ForeignKey("dbo.BaseModels", t => t.BaseModel_Id, cascadeDelete: true)
+                .PrimaryKey(t => new { t.BaseProductModel_Id, t.Order_Id })
+                .ForeignKey("dbo.BaseProductModels", t => t.BaseProductModel_Id, cascadeDelete: true)
                 .ForeignKey("dbo.Orders", t => t.Order_Id, cascadeDelete: true)
-                .Index(t => t.BaseModel_Id)
+                .Index(t => t.BaseProductModel_Id)
                 .Index(t => t.Order_Id);
             
             CreateTable(
@@ -137,7 +137,7 @@ namespace BookStore.DAL.Migrations
                     })
                 .PrimaryKey(t => new { t.Tag_Id, t.Book_Id })
                 .ForeignKey("dbo.Tags", t => t.Tag_Id, cascadeDelete: true)
-                .ForeignKey("dbo.BaseModels", t => t.Book_Id, cascadeDelete: true)
+                .ForeignKey("dbo.BaseProductModels", t => t.Book_Id, cascadeDelete: true)
                 .Index(t => t.Tag_Id)
                 .Index(t => t.Book_Id);
             
@@ -146,29 +146,29 @@ namespace BookStore.DAL.Migrations
         public override void Down()
         {
             DropForeignKey("dbo.AspNetUserRoles", "RoleId", "dbo.AspNetRoles");
-            DropForeignKey("dbo.TagBooks", "Book_Id", "dbo.BaseModels");
+            DropForeignKey("dbo.TagBooks", "Book_Id", "dbo.BaseProductModels");
             DropForeignKey("dbo.TagBooks", "Tag_Id", "dbo.Tags");
-            DropForeignKey("dbo.BaseModels", "User_Id", "dbo.Users");
+            DropForeignKey("dbo.BaseProductModels", "UserId", "dbo.Users");
             DropForeignKey("dbo.AspNetUserRoles", "UserId", "dbo.Users");
-            DropForeignKey("dbo.Orders", "User_Id", "dbo.Users");
+            DropForeignKey("dbo.Orders", "UserId", "dbo.Users");
             DropForeignKey("dbo.AspNetUserLogins", "UserId", "dbo.Users");
             DropForeignKey("dbo.AspNetUserClaims", "UserId", "dbo.Users");
-            DropForeignKey("dbo.BaseModelOrders", "Order_Id", "dbo.Orders");
-            DropForeignKey("dbo.BaseModelOrders", "BaseModel_Id", "dbo.BaseModels");
+            DropForeignKey("dbo.BaseProductModelOrders", "Order_Id", "dbo.Orders");
+            DropForeignKey("dbo.BaseProductModelOrders", "BaseProductModel_Id", "dbo.BaseProductModels");
             DropIndex("dbo.TagBooks", new[] { "Book_Id" });
             DropIndex("dbo.TagBooks", new[] { "Tag_Id" });
-            DropIndex("dbo.BaseModelOrders", new[] { "Order_Id" });
-            DropIndex("dbo.BaseModelOrders", new[] { "BaseModel_Id" });
+            DropIndex("dbo.BaseProductModelOrders", new[] { "Order_Id" });
+            DropIndex("dbo.BaseProductModelOrders", new[] { "BaseProductModel_Id" });
             DropIndex("dbo.AspNetRoles", "RoleNameIndex");
             DropIndex("dbo.AspNetUserRoles", new[] { "RoleId" });
             DropIndex("dbo.AspNetUserRoles", new[] { "UserId" });
             DropIndex("dbo.AspNetUserLogins", new[] { "UserId" });
             DropIndex("dbo.AspNetUserClaims", new[] { "UserId" });
             DropIndex("dbo.Users", "UserNameIndex");
-            DropIndex("dbo.Orders", new[] { "User_Id" });
-            DropIndex("dbo.BaseModels", new[] { "User_Id" });
+            DropIndex("dbo.Orders", new[] { "UserId" });
+            DropIndex("dbo.BaseProductModels", new[] { "UserId" });
             DropTable("dbo.TagBooks");
-            DropTable("dbo.BaseModelOrders");
+            DropTable("dbo.BaseProductModelOrders");
             DropTable("dbo.AspNetRoles");
             DropTable("dbo.Tags");
             DropTable("dbo.AspNetUserRoles");
@@ -176,7 +176,7 @@ namespace BookStore.DAL.Migrations
             DropTable("dbo.AspNetUserClaims");
             DropTable("dbo.Users");
             DropTable("dbo.Orders");
-            DropTable("dbo.BaseModels");
+            DropTable("dbo.BaseProductModels");
         }
     }
 }

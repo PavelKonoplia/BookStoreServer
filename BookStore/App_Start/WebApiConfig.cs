@@ -31,6 +31,9 @@ namespace BookStore
             //Now set the serializer setting for JsonFormatter to Indented to get Json Formatted data  
             config.Formatters.JsonFormatter.SerializerSettings.Formatting =
                 Newtonsoft.Json.Formatting.Indented;
+
+            config.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling =
+                Newtonsoft.Json.ReferenceLoopHandling.Ignore;
         }
     }
 }

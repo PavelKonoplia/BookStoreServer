@@ -1,23 +1,33 @@
 ﻿using BookStore.Common.Interfaces;
 using BookStore.Entity.Models;
 using System.Web.Http;
+using System.Data.Entity;
+using System.Linq;
+using BookStore.BLL;
+using Microsoft.AspNet.Identity;
+using System.Web;
 
 namespace BookStore.Controllers
 {
     public class BookController : ApiController
     {
         IRepository<Book> dataProvider;
+        private IdentityUserManager userManager;
 
-        public BookController(IRepository<Book> dataProvider)
+        public BookController(IRepository<Book> dataProvider, IdentityUserManager userManager)
         {
             this.dataProvider = dataProvider;
+            this.userManager = userManager;
         }
 
         [HttpGet]
         [Route("api/book")]
         public IHttpActionResult Get()
         {
-            return Ok(dataProvider.GetAll());
+            IQueryable<Book> query = dataProvider.GetAll() as IQueryable<Book>;            
+            query = query.Include(x => x.Tags);
+
+            return Ok(query.ToArray());
         }
 
         [Authorize]
@@ -27,8 +37,9 @@ namespace BookStore.Controllers
             return Ok(dataProvider.FindBy(d => d.Id == id));
         }
 
+        // [Authorize(Roles = "Seller")]
 
-        [Authorize]
+        [Authorize(Roles = "Seller")]
         [HttpPost]
         [Route("api/book")]
         public IHttpActionResult Post([FromBody]Book book)

@@ -3,9 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BookStore.Entity.Models
 {
-    public class BaseModel
+    public class BaseProductModel
     {
-        public BaseModel()
+        public BaseProductModel()
         {
             this.Orders = new HashSet<Order>();
         }
@@ -14,6 +14,10 @@ namespace BookStore.Entity.Models
         public int Id { get; set; }
 
         public decimal Price { get; set; }
+
+        public long? UserId { get; set; }
+
+        public User User { get; set; }
 
         public ICollection<Order> Orders { get; set; }
     }

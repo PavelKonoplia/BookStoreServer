@@ -116,9 +116,9 @@
     <Compile Include="CustomRoleStore.cs" />
     <Compile Include="CustomUserStore.cs" />
     <Compile Include="IdentityDatabaseContext.cs" />
-    <Compile Include="Migrations\201806261441335_initial.cs" />
-    <Compile Include="Migrations\201806261441335_initial.Designer.cs">
-      <DependentUpon>201806261441335_initial.cs</DependentUpon>
+    <Compile Include="Migrations\201807031532444_initial.cs" />
+    <Compile Include="Migrations\201807031532444_initial.Designer.cs">
+      <DependentUpon>201807031532444_initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -139,8 +139,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201806261441335_initial.resx">
-      <DependentUpon>201806261441335_initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201807031532444_initial.resx">
+      <DependentUpon>201807031532444_initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

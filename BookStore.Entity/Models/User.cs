@@ -11,12 +11,12 @@ namespace BookStore.Entity.Models
 
         public User()
         {
-            this.Selling = new HashSet<BaseModel>();
+            this.Selling = new HashSet<BaseProductModel>();
 
             this.Orders = new HashSet<Order>();
         }
 
-        public ICollection<BaseModel> Selling { get; set; }
+        public ICollection<BaseProductModel> Selling { get; set; }
 
         public ICollection<Order> Orders { get; set; }
 
