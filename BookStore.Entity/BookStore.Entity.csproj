@@ -116,6 +116,7 @@
     <Compile Include="Enums\Role.cs" />
     <Compile Include="Models\BaseProductModel.cs" />
     <Compile Include="Models\Book.cs" />
+    <Compile Include="Models\CustomerToSellerRequest.cs" />
     <Compile Include="Models\CustomRole.cs" />
     <Compile Include="Models\CustomUserClaim.cs" />
     <Compile Include="Models\CustomUserLogin.cs" />

@@ -17,6 +17,8 @@ namespace BookStore.DAL
 
         public DbSet<Order> Orders { get; set; }
 
+        public DbSet<CustomerToSellerRequest> Requests { get; set; }
+
         public static IdentityDatabaseContext Create()
         {
             return new IdentityDatabaseContext();
