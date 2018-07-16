@@ -1,12 +1,5 @@
 ﻿using BookStore.BLL;
-using BookStore.DAL;
-using BookStore.Entity.Enums;
 using BookStore.Entity.Models;
-using Microsoft.AspNet.Identity;
-using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 
@@ -23,29 +16,23 @@ namespace BookStore.Controllers
             this.userManager = userManager;
         }
 
-
         [Authorize(Roles = "Admin")]
         [HttpGet]
         [Route("api/user")]
         public IHttpActionResult Get()
         {
-          //  IQueryable<User> query = this.userManager.Users;
-           // query = query.Include(x => x.Selling).Include(x => x.Orders);
-
             return Ok(this.userService.GetUsers());
         }
-
 
         [Authorize(Roles = "Admin")]
         [HttpGet]
         [Route("api/user/{login}")]
         public async Task<IHttpActionResult> Get(string login)
         {
-            var user = await this.userManager.FindByNameAsync(login);
-
-            if (user != null)
+            var result = this.userService.FindByName(login);
+            if (result != null)
             {
-                return Ok(user);
+                return Ok(result);
             }
 
             return NotFound();
@@ -55,23 +42,14 @@ namespace BookStore.Controllers
         [Route("api/user")]
         public async Task<IHttpActionResult> Post([FromBody]User user)
         {
-            var userData = new User()
+            var result = await this.userService.AddUser(user);
+
+            if (result)
             {
-                Id = user.Id,
-                UserName = user.UserName,
-                Email = user.Email == null ? $"{user.UserName} {user.Id}@gmail.com" : user.Email
-            };
-
-            IdentityResult addUserResult = await this.userManager.CreateAsync(userData, user.PasswordHash);
-
-            if (!addUserResult.Succeeded)
-            {                
-                return StatusCode(System.Net.HttpStatusCode.BadRequest);
+                return Ok(user);
             }
 
-            await this.userManager.AddToRoleAsync(userData.Id, Role.Customer.ToString());
-
-            return Created("api/user", user);
+            return NotFound();
         }
 
         [Authorize(Roles = "Admin")]
@@ -79,17 +57,13 @@ namespace BookStore.Controllers
         [Route("api/user/{id}")]
         public async Task<IHttpActionResult> Delete(long id)
         {
-            User user = await userManager.FindByIdAsync(id);
+            var result = await this.userService.DeleteUser(id);
 
-            if (user != null)
+            if (result)
             {
-                IdentityResult result = await userManager.DeleteAsync(user);
-                return Ok(result);
+                return Ok();
             }
-            else
-            {
-                return NotFound();
-            }
+            return NotFound();
         }
 
         [Authorize(Roles = "Admin")]
@@ -97,19 +71,15 @@ namespace BookStore.Controllers
         [Route("api/user")]
         public async Task<IHttpActionResult> UpdateRole([FromUri] long id, [FromUri]string role)
         {
-            User user = await userManager.FindByIdAsync(id);
-            if (user != null)
+
+            var result = await userService.UpdateRole(id, role);
+
+            if (result)
             {
-                await userManager.RemoveFromRolesAsync(user.Id, Enum.GetNames(typeof(Role)));
-                await userManager.AddToRoleAsync(user.Id, role);
                 return Ok();
             }
-            else
-            {
-                return NotFound();
-            }
+            return NotFound();
         }
-
 
         [Authorize]
         [HttpGet]
