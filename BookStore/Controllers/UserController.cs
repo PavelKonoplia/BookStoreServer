@@ -7,13 +7,11 @@ namespace BookStore.Controllers
 {
     public class UserController : ApiController
     {
-        private IdentityUserManager userManager;
         private UserService userService;
 
-        public UserController(IdentityUserManager userManager, UserService userService)
+        public UserController( UserService userService)
         {
             this.userService = userService;
-            this.userManager = userManager;
         }
 
         [Authorize(Roles = "Admin")]
@@ -79,24 +77,6 @@ namespace BookStore.Controllers
                 return Ok();
             }
             return NotFound();
-        }
-
-        [Authorize]
-        [HttpGet]
-        [Route("api/user")]
-        public async Task<IHttpActionResult> GetRole([FromUri]long id)
-        {
-            User user = await userManager.FindByIdAsync(id);
-
-            if (user != null)
-            {
-                var roles = await userManager.GetRolesAsync(user.Id);
-                return Ok(roles);
-            }
-            else
-            {
-                return NotFound();
-            }
         }
     }
 }

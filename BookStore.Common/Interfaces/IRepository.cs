@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -9,6 +10,8 @@ namespace BookStore.Common.Interfaces
         IQueryable<T> GetAll();
 
         T FindBy(Expression<Func<T, bool>> predicate);
+
+        IEnumerable<T> FindMany(Expression<Func<T, bool>> predicate);
 
         void Add(T item);
 

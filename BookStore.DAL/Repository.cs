@@ -1,5 +1,6 @@
 ﻿using BookStore.Common.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
@@ -25,6 +26,12 @@ namespace BookStore.DAL
         public T FindBy(Expression<Func<T, bool>> predicate)
         {
             return this.dbSet.Where(predicate).FirstOrDefault();
+        }
+
+        public IEnumerable<T> FindMany(Expression<Func<T, bool>> predicate)
+        {
+            var b = this.dbSet.All(predicate);
+            return this.dbSet.Where(predicate);
         }
 
         public void Delete(int id)

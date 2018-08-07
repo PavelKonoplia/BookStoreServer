@@ -1,4 +1,5 @@
-﻿using BookStore.DAL;
+﻿using BookStore.Common.Interfaces;
+using BookStore.DAL;
 using BookStore.Entity.Enums;
 using BookStore.Entity.Models;
 using Microsoft.AspNet.Identity;
@@ -18,10 +19,12 @@ namespace BookStore.BLL
 
         private IQueryable<CustomRole> roles;
 
-        public UserService(IdentityUserManager userManager, IdentityDatabaseContext dbContext)
+        private BookService bookService;
+
+        public UserService(IdentityUserManager userManager, IdentityDatabaseContext dbContext, BookService bookService)
         {
             this.userManager = userManager;
-
+            this.bookService = bookService;
             this.roles = dbContext.Roles.Distinct() as IQueryable<CustomRole>;
         }
 
@@ -41,6 +44,19 @@ namespace BookStore.BLL
         public UserInfo FindByName(string name)
         {
             User user = this.userManager.FindByNameAsync(name).Result;
+
+            return new UserInfo
+            {
+                UserName = user.UserName,
+                Id = user.Id,
+                Email = user.Email,
+                RoleName = roles.FirstOrDefault(r => r.Id == user.Roles.FirstOrDefault().RoleId).Name
+            };
+        }
+
+        public UserInfo FindById(long id)
+        {
+            User user = this.userManager.FindByIdAsync(id).Result;
 
             return new UserInfo
             {
@@ -96,10 +112,14 @@ namespace BookStore.BLL
         public async Task<bool> DeleteUser(long id)
         {
             User user = await userManager.FindByIdAsync(id);
-
+           
             if (user != null)
             {
-                IdentityResult result = await userManager.DeleteAsync(user);
+                if (user.Selling.Count!=0)
+                {
+                    this.bookService.DeleteBooksByUser(id);
+                }
+                await userManager.DeleteAsync(user);
                 return true;
             }
             else

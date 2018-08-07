@@ -114,6 +114,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationOAuthProvider.cs" />
+    <Compile Include="BookService.cs" />
     <Compile Include="IdentityRoleManagercs.cs" />
     <Compile Include="IdentityUserManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -124,6 +125,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BookStore.Common\BookStore.Common.csproj">
+      <Project>{12F83D8E-A3C1-481A-B7AA-C027D6CE1770}</Project>
+      <Name>BookStore.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BookStore.DAL\BookStore.DAL.csproj">
       <Project>{7edc0750-c286-44c5-b402-b788526b15e2}</Project>
       <Name>BookStore.DAL</Name>

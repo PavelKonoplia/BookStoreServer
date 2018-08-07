@@ -45,8 +45,9 @@ namespace BookStore
             builder.RegisterType<CustomRoleStore>().As(typeof(IRoleStore<CustomRole, long>)).InstancePerDependency();
             builder.RegisterType<CustomUserStore>().As(typeof(IUserStore<User, long>)).InstancePerDependency();
             builder.RegisterType<IdentityUserManager>().InstancePerDependency();
-            builder.RegisterType<IdentityRoleManager>().InstancePerDependency(); ;
+            builder.RegisterType<IdentityRoleManager>().InstancePerDependency(); 
             builder.RegisterType<UserService>().InstancePerDependency();
+            builder.RegisterType<BookService>().InstancePerDependency();
             builder.RegisterType<IdentityFactoryOptions<IdentityUserManager>>().InstancePerDependency();
           //  builder.RegisterType<IdentityFactoryOptions<IdentityRoleManager>>().InstancePerDependency();
 
@@ -60,15 +61,12 @@ namespace BookStore
             app.UseAutofacWebApi(config);
             
             // end of autofac configure 
-
-
             
             ConfigureAuth(app, container.Resolve<IdentityUserManager>());
 
             WebApiConfig.Register(config);
             app.UseWebApi(config);
         }
-
 
         public void ConfigureAuth(IAppBuilder app, IdentityUserManager userManager)
         {           

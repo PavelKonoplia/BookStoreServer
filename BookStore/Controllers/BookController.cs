@@ -3,21 +3,16 @@ using BookStore.Entity.Models;
 using System.Web.Http;
 using System.Data.Entity;
 using System.Linq;
-using BookStore.BLL;
-using Microsoft.AspNet.Identity;
-using System.Web;
 
 namespace BookStore.Controllers
 {
     public class BookController : ApiController
     {
         IRepository<Book> dataProvider;
-        private IdentityUserManager userManager;
 
-        public BookController(IRepository<Book> dataProvider, IdentityUserManager userManager)
+        public BookController(IRepository<Book> dataProvider)
         {
             this.dataProvider = dataProvider;
-            this.userManager = userManager;
         }
 
         [HttpGet]
@@ -36,9 +31,7 @@ namespace BookStore.Controllers
         {
             return Ok(dataProvider.FindBy(d => d.Id == id));
         }
-
-        // [Authorize(Roles = "Seller")]
-
+        
         [Authorize(Roles = "Seller")]
         [HttpPost]
         [Route("api/book")]
@@ -48,8 +41,7 @@ namespace BookStore.Controllers
             return Ok();
         }
         
-        [Authorize(Roles = "Admin")]
-        [Authorize(Roles = "Seller")]
+        [Authorize(Roles = "Seller, Admin")]
         [Route("api/book/{id}")]
         public IHttpActionResult Delete(int id)
         {
